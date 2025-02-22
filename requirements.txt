@@ -11,6 +11,7 @@ langchain-community
 langchain-google-genai
 langchain-groq
 langchain-xai
+rich
 langgraph
 langgraph-checkpoint-sqlite
 numpy
