@@ -38,10 +38,11 @@ async def chat(request: ChatRequest):
         
         output = graph.invoke({"messages": [human_message], "question": user_input , "summary": request.summary}, config)
         response_text = str(output['generation'])
+        new_summary = str(output['summary'])
 
         rprint(Panel("AI: " + response_text))
 
-        return {"message": response_text,'session_id':request.session_id , 'summary': request.summary}
+        return {"message": response_text,'session_id':request.session_id , 'summary': new_summary}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
