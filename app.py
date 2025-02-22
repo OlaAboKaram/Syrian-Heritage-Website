@@ -15,6 +15,7 @@ class ChatRequest(BaseModel):
     message: str
     summary: str
     session_id: str
+    user_id: str
 
 # while True:
 #     user_input = input('You: ')
@@ -42,7 +43,7 @@ async def chat(request: ChatRequest):
 
         rprint(Panel("AI: " + response_text))
 
-        return {"message": response_text,'session_id':request.session_id , 'summary': new_summary}
+        return {"message": response_text,'session_id':request.session_id , 'summary': new_summary , 'user_id': request.user_id}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
