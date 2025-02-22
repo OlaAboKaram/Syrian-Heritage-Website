@@ -14,12 +14,7 @@ langchain-xai
 langgraph
 langgraph-checkpoint-sqlite
 numpy
-pandas
-pdf2image
 pydantic
-pymupdf
-pymupdf4llm
-pytesseract
 requests
 scikit-learn
 scipy
