@@ -60,5 +60,5 @@ def build_graph():
     workflow.add_edge("tavily_search", "generate")
     workflow.add_edge("duckduckgo_search", "generate")
     memory = MemorySaver()
-    graph = workflow.compile(checkpointer = memory)
+    graph = workflow.compile()
     return graph
