@@ -4,6 +4,7 @@ catboost
 colorama
 faiss-cpu
 fastapi
+duckduckgo-search
 huggingface-hub
 uvicorn
 joblib
