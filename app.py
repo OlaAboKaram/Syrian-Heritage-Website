@@ -16,7 +16,7 @@ class ChatRequest(BaseModel):
     message: str
     summary: str
     session_id: str
-    user_id: Optional[str] = None  
+    user_id: Optional[str] = ''
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
