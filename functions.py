@@ -94,7 +94,7 @@ def summarization_router(state: State):
     messages = state['messages']
     last_message = state["messages"][-1]
     
-    if len(messages) > 5:
+    if len(messages) > 3:
         return 'summarize_conversation'
     return 'END'
 def no_rag_router(state: State):
