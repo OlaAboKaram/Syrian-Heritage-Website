@@ -15,8 +15,8 @@ app = FastAPI()
 class ChatRequest(BaseModel):
     message: str
     summary: str
-    session_id: str
-    user_id: Optional[str] = ''
+    session_id: int 
+    user_id: Optional[int] = ''
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -37,9 +37,9 @@ async def chat(request: ChatRequest):
 
         return {
             "message": response_text,
-            "session_id": request.session_id,
+            "session_id": session_id,
             "summary": new_summary,
-            "user_id": request.user_id  
+            "user_id": user_id  
         }
 
     except Exception as e:
