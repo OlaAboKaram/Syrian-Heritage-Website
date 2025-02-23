@@ -1,0 +1,11 @@
+Q&A_data/
+average_plots/
+dataset_generation/
+evaluation_results/
+intent_classifier_models/
+evaluate_new_chat.py
+train_svc.ipynb 
+user_interface_streamlit.py
+vector_db_generation.py
+workflow.png
+
