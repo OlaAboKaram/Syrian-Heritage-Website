@@ -8,8 +8,6 @@ from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage, Too
 
 graph = build_graph()
 
-config = {"configurable": {"thread_id": "2"}}
-
 app = FastAPI()
 
 class ChatRequest(BaseModel):
@@ -29,6 +27,7 @@ async def chat(request: ChatRequest):
     human_message = HumanMessage(content=user_input)
     
     try:
+        config = {"configurable": {"thread_id": str(request.session_id)}}
         output = graph.invoke({"messages": [human_message], "question": user_input, "summary": request.summary}, config)
         response_text = str(output['generation'])
         new_summary = str(output['summary'])
