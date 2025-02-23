@@ -16,7 +16,7 @@ class ChatRequest(BaseModel):
     message: str
     summary: str
     session_id: int 
-    user_id: Optional[int] = ''
+    user_id: Optional[int] = -1
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -37,9 +37,9 @@ async def chat(request: ChatRequest):
 
         return {
             "message": response_text,
-            "session_id": session_id,
+            "session_id": request.session_id,
             "summary": new_summary,
-            "user_id": user_id  
+            "user_id": request.user_id  
         }
 
     except Exception as e:
