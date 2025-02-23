@@ -8,7 +8,7 @@ class Config(TypedDict):
     normalize_embeddings: bool
 
 config: Config = {
-'model_name': 'llama-3.3-70b-versatile',#'deepseek-r1-distill-llama-70b',#'llama3-70b-8192',#,'deepseek-r1-distill-llama-70b'#,
+'model_name': 'llama3-70b-8192',#'llama-3.3-70b-versatile',#'deepseek-r1-distill-llama-70b',#'llama3-70b-8192',#,'deepseek-r1-distill-llama-70b'#,
 'embedding_model_name': 'sentence-transformers/all-MiniLM-L12-v2',
 'device': 'cpu',
 'normalize_embeddings': True,
