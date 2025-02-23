@@ -48,7 +48,7 @@ class GenerationNode:
         self.generation_prompt =   """You are an assistant for question-answering tasks (specifically syrian heritage). 
             You've got a summary of your current conversation (it may be empty): {memory}.
             
-            Use the following documents to augment your internal knowledge to answer to the question. 
+            Use the following documents (from the database/web search using tavily and duckduckgo) to augment your internal knowledge to answer to the question. 
             
             - If you don't know the answer, just say that you don't know. 
             - If the user asks a simple question, just answer politely (such as greeting).
