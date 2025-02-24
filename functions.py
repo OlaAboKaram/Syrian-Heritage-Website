@@ -13,7 +13,18 @@ import numpy as np
 import pickle
 from typing import Annotated
 import faiss
+from pydantic import BaseModel, Field
 load_dotenv()
+
+class IntentClassifierResponse(BaseModel):
+    answer: str = Field(
+        description="Return 'yes' if the query requires retrieving historical or cultural information (i.e., RAG is needed), "
+                    "or 'no' if it does not (i.e., RAG is not required)."
+    )
+    translation: str = Field(
+        description="If the original query is in English, return it unchanged. "
+                    "Otherwise, provide an accurate translation of the query into English."
+    )
 
 os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
 
@@ -23,7 +34,6 @@ class State(MessagesState):
     duckduck_docs: str
     documents: list
     question: str
-    generation: str
 
 model_name = config['model_name']
 top_k = config['top_k']
@@ -47,32 +57,62 @@ generation_node = GenerationNode(model_name)
 grader_node = GraderNode(model_name)
 model = ChatGroq(model_name=model_name, temperature=0)
 
-
-
 ##########################################################################################
+# def intent_classifier(state: State):
+#     print(bcolors.OKBLUE + 'Running the intent classifier..' + bcolors.ENDC)
+#     question = state.get("question",'')
+#     summary = state.get('summary','')
+#     allowed_words = r"hello|marhaba|hi|good|thank|joke|poem|fun|Keefak|peace upon you|Morning|Evening|good morning|good evening"
+#     if re.fullmatch(rf"\s*({allowed_words})(\s+({allowed_words}))*\s*", question.lower()):
+#         no_rag = True
+#     else:
+#         rag_prompt = f'''You got the following 
+#         user query: {question}. Return only and only 'yes' or 'no': \n
+#         - return yes if the query needs to retrieve information about history from the database (the question is about history / culture). \n
+#         - retunr no if the query doesn't need to retrieve information from the data base (such as greeting or not related to history and culture).
+#         - Note that your response should be only and only 'yes' or 'no'.
+#         '''
+#         response = model.invoke([SystemMessage(content=rag_prompt)])
+#         no_rag = False
+    
+#         if response.content.lower() == 'yes':
+#             no_rag = False
+#         else:
+#             no_rag = True
+#     return {'question': question , 'messages': question, 'no_rag': no_rag}
 def intent_classifier(state: State):
     print(bcolors.OKBLUE + 'Running the intent classifier..' + bcolors.ENDC)
-    question = state.get("question",'')
-    summary = state.get('summary','')
+    question = state.get("question", '')
+    summary = state.get("summary", '')
     allowed_words = r"hello|marhaba|hi|good|thank|joke|poem|fun|Keefak|peace upon you|Morning|Evening|good morning|good evening"
+    
     if re.fullmatch(rf"\s*({allowed_words})(\s+({allowed_words}))*\s*", question.lower()):
         no_rag = True
+        translation = ""  # No translation needed for simple greetings.
     else:
-        rag_prompt = f'''You got the following 
-        user query: {question}. Return only and only 'yes' or 'no': \n
-        - return yes if the query needs to retrieve information about history from the database (the question is about history / culture). \n
-        - retunr no if the query doesn't need to retrieve information from the data base (such as greeting or not related to history and culture).
-        - Note that your response should be only and only 'yes' or 'no'.
+        rag_prompt = f'''You got the following user query: "{question}".
+        Please return a valid JSON object with exactly two keys:
+          - "answer": "yes" if the user query needs to retrieve historical/cultural information from the database (i.e. RAG is needed),
+                      or "no" if it does not.
+          - "translation": the translation of the user query into English.
+        Do not include any additional text.
         '''
-        response = model.invoke([SystemMessage(content=rag_prompt)])
-        no_rag = False
-    
-        if response.content.lower() == 'yes':
-            no_rag = False
-        else:
-            no_rag = True
-    return {'question': question , 'messages': question, 'no_rag': no_rag}
+        structured_model = model.with_structured_output(IntentClassifierResponse)
+        structured_response = model.invoke([SystemMessage(content=rag_prompt)])
 
+        # If answer is "yes", then RAG is needed, so no_rag should be False.
+        no_rag = False if structured_response["answer"].lower() == "yes" else True
+        translation = structured_response["translation"]
+    
+    # Return the original question, a duplicate in 'messages' (if needed), the no_rag flag, and the translation.
+    return {
+        'question': question,
+        'messages': question,
+        'no_rag': no_rag,
+        'translation': translation
+    }
+
+################################################################################################
 # def retrieve(state: State):
 
 #     print(bcolors.OKBLUE + 'Retrieving..' + bcolors.ENDC)
@@ -85,7 +125,12 @@ def intent_classifier(state: State):
 #     return {'documents':docs}
 def retrieve(state: State):
     print(bcolors.OKBLUE + 'Retrieving..' + bcolors.ENDC)
-    query = state["messages"][-1].content
+    message = state["messages"][-1].content
+    translation = state["translation"].content
+    if translation:
+        query = translation
+    else:
+        query = message
     query_embedding = np.array([embeddings.embed_query(query)], dtype=np.float32)
     _, indices = index.search(query_embedding, k=top_k)
     docs = [final_chunks[i] for i in indices[0] if i < len(final_chunks)]
@@ -198,7 +243,6 @@ def generate(state: State):
     return {
         "documents": documents,
         "question": question,
-        "generation": generation,
         "messages": generation
     }    
 
