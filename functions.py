@@ -98,7 +98,7 @@ def intent_classifier(state: State):
         Do not include any additional text.
         '''
         structured_model = model.with_structured_output(IntentClassifierResponse)
-        structured_response = model.invoke([SystemMessage(content=rag_prompt)])
+        structured_response = structured_model.invoke([SystemMessage(content=rag_prompt)])
 
         # If answer is "yes", then RAG is needed, so no_rag should be False.
         no_rag = False if structured_response["answer"].lower() == "yes" else True
