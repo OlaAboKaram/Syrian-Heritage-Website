@@ -54,19 +54,23 @@ def intent_classifier(state: State):
     print(bcolors.OKBLUE + 'Running the intent classifier..' + bcolors.ENDC)
     question = state.get("question",'')
     summary = state.get('summary','')
-    rag_prompt = f'''You got the following 
-    user query: {question}. Return only and only 'yes' or 'no': \n
-    - return yes if the query needs to retrieve information about history from the database (the question is about history/culutre). \n
-    - retunr no if the query doesn't need to retrieve information from the data base (such as greeting or not history/culture related).
-    - Note that your response should be only and only 'yes' or 'no'.
-    '''
-    response = model.invoke([SystemMessage(content=rag_prompt)])
-    no_rag = False
-    
-    if response.content.lower() == 'yes':
-        no_rag = False
-    else:
+    allowed_words = r"hello|marhaba|hi|good|thank|joke|poem|fun|Keefak|peace upon you|Morning|Evening|good morning|good evening"
+    if re.fullmatch(rf"\s*({allowed_words})(\s+({allowed_words}))*\s*", question.lower()):
         no_rag = True
+    else:
+        rag_prompt = f'''You got the following 
+        user query: {question}. Return only and only 'yes' or 'no': \n
+        - return yes if the query needs to retrieve information about history from the database (the question is about history / culture). \n
+        - retunr no if the query doesn't need to retrieve information from the data base (such as greeting or not related to history and culture).
+        - Note that your response should be only and only 'yes' or 'no'.
+        '''
+        response = model.invoke([SystemMessage(content=rag_prompt)])
+        no_rag = False
+    
+        if response.content.lower() == 'yes':
+            no_rag = False
+        else:
+            no_rag = True
     return {'question': question , 'messages': question, 'no_rag': no_rag}
 
 # def retrieve(state: State):
