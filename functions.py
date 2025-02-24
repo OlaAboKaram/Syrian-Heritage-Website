@@ -13,6 +13,7 @@ import numpy as np
 import pickle
 from typing import Annotated
 import faiss
+import re
 from pydantic import BaseModel, Field
 load_dotenv()
 
