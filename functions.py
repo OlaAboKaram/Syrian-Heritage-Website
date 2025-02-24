@@ -102,8 +102,8 @@ def intent_classifier(state: State):
         structured_response = structured_model.invoke([SystemMessage(content=rag_prompt)])
 
         # If answer is "yes", then RAG is needed, so no_rag should be False.
-        no_rag = False if structured_response["answer"].lower() == "yes" else True
-        translation = structured_response["translation"]
+        no_rag = False if structured_response.answer.lower() == "yes" else True
+        translation = structured_response.translation
     
     # Return the original question, a duplicate in 'messages' (if needed), the no_rag flag, and the translation.
     return {
