@@ -128,7 +128,7 @@ def intent_classifier(state: State):
 def retrieve(state: State):
     print(bcolors.OKBLUE + 'Retrieving..' + bcolors.ENDC)
     message = state["messages"][-1].content
-    translation = state["translation"].content
+    translation = state["translation"]
     if translation:
         query = translation
     else:
