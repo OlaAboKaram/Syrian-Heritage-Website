@@ -35,6 +35,7 @@ class State(MessagesState):
     duckduck_docs: str
     documents: list
     question: str
+    translation: str
 
 model_name = config['model_name']
 top_k = config['top_k']
