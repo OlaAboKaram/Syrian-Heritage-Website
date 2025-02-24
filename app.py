@@ -29,7 +29,7 @@ async def chat(request: ChatRequest):
     try:
         config = {"configurable": {"thread_id": str(request.session_id)}}
         output = graph.invoke({"messages": [human_message], "question": user_input, "summary": request.summary}, config)
-        response_text = str(output['generation'])
+        response_text = str(output["messages"][-1].content)
         new_summary = str(output['summary'])
 
         rprint(Panel("AI: " + response_text))
